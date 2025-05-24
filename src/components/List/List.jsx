@@ -3,12 +3,16 @@ import Task from './Task/Task';
 import { IoSearch } from "react-icons/io5";
 import { MdAddCircleOutline } from "react-icons/md";
 import { slugify } from '../../utils/formatter';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 export default function List() {
   const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
   const [tasks, setTasks] = useState(localTasks);
   const [taskName, setTaskName] = useState('');
   const [searchResult, setSearchResult] = useState(localTasks);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const completeTask = (taskId) => {
     const updatedTasks = tasks.map(i =>
@@ -27,10 +31,11 @@ export default function List() {
       slug: taskName ? (slugify(taskName + ' ' + Date.now())) : 'new-task-' + Date.now(),
       isCompleted: false,
     }
-    const updatedTasks = [...tasks, newTask];
+    const updatedTasks = [newTask, ...tasks];
 
     updateList(updatedTasks);
-    setTaskName('')
+    setTaskName('');
+    closeModal();
   }
 
   const editTask = (taskId, newName) => {
@@ -63,6 +68,13 @@ export default function List() {
     setSearchResult(result);
   }
 
+  const openModal = () => {
+    setModalIsOpen(true);
+  }
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  }
 
   return (
     <div style={{ width: "50%", margin: "0 auto", alignItems: "center", justifyContent: "center" }}>
@@ -84,7 +96,7 @@ export default function List() {
           </button>
         </form>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-          <MdAddCircleOutline size={30} onClick={addTask} />
+          <MdAddCircleOutline size={30} onClick={openModal} />
         </button>
       </div >
 
@@ -99,6 +111,36 @@ export default function List() {
           />
         ))}
       </div>
+
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={{
+          content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+          },
+          borderRadius: '10px'
+        }}
+        contentLabel="Add new task"
+      >
+        <form onSubmit={addTask}>
+          <label htmlFor="task-name">Task name:</label>
+          <input
+            type="text"
+            id="task-name"
+            name="task-name"
+            placeholder="New task"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+          />
+          <input type="submit" value="Add" />
+        </form>
+      </Modal>
     </div >
   )
 }
