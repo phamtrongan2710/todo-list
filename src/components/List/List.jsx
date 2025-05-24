@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import Task from './Task/Task';
+import { IoSearch } from "react-icons/io5";
+import { MdAddCircleOutline } from "react-icons/md";
 
 export default function List() {
   const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
   const [tasks, setTasks] = useState(localTasks);
-
   const [taskName, setTaskName] = useState('');
+  const [searchResult, setSearchResult] = useState(localTasks);
 
   const completeTask = (taskId) => {
     const updatedTasks = tasks.map(i =>
@@ -13,7 +15,7 @@ export default function List() {
         ? { ...i, isCompleted: !i.isCompleted }
         : i
     );
-    updateListState(updatedTasks);
+    updateList(updatedTasks);
   };
 
   const addTask = (event) => {
@@ -25,7 +27,7 @@ export default function List() {
     }
     const updatedTasks = [...tasks, newTask];
 
-    updateListState(updatedTasks);
+    updateList(updatedTasks);
     setTaskName('')
   }
 
@@ -35,38 +37,54 @@ export default function List() {
         ? { ...i, name: newName }
         : i
     );
-    updateListState(updatedTasks);
+    updateList(updatedTasks);
   };
 
   const removeTask = (taskId) => {
     const updatedTasks = tasks.filter(i => i.id !== taskId);
-    updateListState(updatedTasks);
+    updateList(updatedTasks);
   }
 
-  const updateListState = (tasks) => {
+  const updateList = (tasks) => {
     setTasks(tasks);
+    setSearchResult(tasks);
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
+
+  const findTask = (event) => {
+    event.preventDefault();
+    if (!taskName) setSearchResult(tasks);;
+    const result = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
+    setSearchResult(result);
+  }
+
 
   return (
     <div style={{ width: "50%", margin: "0 auto", alignItems: "center", justifyContent: "center" }}>
       <h1>TODO LIST</h1>
 
-      <form onSubmit={addTask}>
-        <label htmlFor="task-name">Task name:</label>
-        <input
-          type="text"
-          id="task-name"
-          name="task-name"
-          placeholder="New task"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-        />
-        <input type="submit" value="Add" />
-      </form>
+      <div style={{ display: 'flex', flex: '1', alignItems: 'center', backgroundColor: 'white', borderRadius: '10px', marginBottom: '20px', padding: '0px 10px' }}>
+        <form onSubmit={findTask} style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <label htmlFor="task-name">Find:</label>
+          <input
+            type="text"
+            id="task-name"
+            name="task-name"
+            placeholder="Task name"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+          />
+          <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <IoSearch size={30} />
+          </button>
+        </form>
+        <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <MdAddCircleOutline size={30} onClick={addTask} />
+        </button>
+      </div >
 
       <div className="flex-container list">
-        {tasks.map((task) => (
+        {searchResult.map((task) => (
           <Task
             key={task.id}
             task={task}
