@@ -4,6 +4,7 @@ import { IoSearch } from "react-icons/io5";
 import { MdAddCircleOutline } from "react-icons/md";
 import { slugify } from '../../utils/formatter';
 import Modal from 'react-modal';
+import Pagination from '../Pagination/Pagination';
 
 Modal.setAppElement('#root');
 
@@ -13,6 +14,13 @@ export default function List() {
   const [taskName, setTaskName] = useState('');
   const [searchResult, setSearchResult] = useState(localTasks);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const tasksPerPage = 3;
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = searchResult.slice(indexOfFirstTask, indexOfLastTask);
+
 
   const completeTask = (taskId) => {
     const updatedTasks = tasks.map(i =>
@@ -76,6 +84,8 @@ export default function List() {
     setModalIsOpen(false);
   }
 
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div style={{ width: "50%", margin: "0 auto", alignItems: "center", justifyContent: "center" }}>
       <h1>TODO LIST</h1>
@@ -101,7 +111,7 @@ export default function List() {
       </div >
 
       <div className="flex-container list">
-        {searchResult.map((task) => (
+        {currentTasks.map((task) => (
           <Task
             key={task.id}
             task={task}
@@ -111,6 +121,13 @@ export default function List() {
           />
         ))}
       </div>
+
+      <Pagination
+        itemsPerPage={tasksPerPage}
+        totalItems={searchResult.length}
+        currentPage={currentPage}
+        paginate={paginate}
+      />
 
       <Modal
         isOpen={modalIsOpen}

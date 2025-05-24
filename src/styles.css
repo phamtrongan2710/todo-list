@@ -103,3 +103,32 @@ form input[type="submit"] {
 form input[type="submit"]:hover {
   background-color: black;
 }
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  justify-content: center;
+  margin: 20px;
+}
+
+.pagination li {
+  margin: 0 5px;
+}
+
+.pagination a {
+  display: block;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination a:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination .active a {
+  background-color:#333;
+  color: #fff;
+}
