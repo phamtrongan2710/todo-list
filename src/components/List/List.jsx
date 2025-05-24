@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Task from './Task/Task';
 import { IoSearch } from "react-icons/io5";
 import { MdAddCircleOutline } from "react-icons/md";
+import { slugify } from '../../utils/formatter';
 
 export default function List() {
   const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
@@ -23,6 +24,7 @@ export default function List() {
     const newTask = {
       id: tasks.length,
       name: taskName ? taskName : 'New Task',
+      slug: taskName ? (slugify(taskName + ' ' + Date.now())) : 'new-task-' + Date.now(),
       isCompleted: false,
     }
     const updatedTasks = [...tasks, newTask];
@@ -34,7 +36,7 @@ export default function List() {
   const editTask = (taskId, newName) => {
     const updatedTasks = tasks.map(i =>
       i.id === taskId
-        ? { ...i, name: newName }
+        ? { ...i, name: newName, slug: slugify(newName + ' ' + Date.now()) }
         : i
     );
     updateList(updatedTasks);
@@ -53,7 +55,10 @@ export default function List() {
 
   const findTask = (event) => {
     event.preventDefault();
-    if (!taskName) setSearchResult(tasks);;
+    if (!taskName) {
+      setSearchResult(tasks);
+      return;
+    };
     const result = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
     setSearchResult(result);
   }

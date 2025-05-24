@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BiEditAlt } from "react-icons/bi";
 import { IoTrashBinSharp } from "react-icons/io5";
+import { FaRegArrowAltCircleRight } from "react-icons/fa";
+import { Link } from 'react-router';
 
 export default function Task({ task, completeTask, editTask, removeTask }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -51,6 +53,10 @@ export default function Task({ task, completeTask, editTask, removeTask }) {
       <div className="task-right">
         <BiEditAlt onClick={handleEdit} />
         <IoTrashBinSharp onClick={() => removeTask(task.id)} />
+        <Link to={`/${task.slug}`} >
+          <FaRegArrowAltCircleRight />
+        </Link>
+
       </div>
     </div>
   )
