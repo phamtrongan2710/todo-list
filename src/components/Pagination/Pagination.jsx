@@ -21,32 +21,28 @@ export default function Pagination({ itemsPerPage, totalItems, currentPage, pagi
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', padding: '10px' }}>
-      <button
-        style={{ border: 'none', backgroundColor: 'inherit' }}
-        onClick={() => handlePageClick(activePage - 1)}
-        hidden={activePage === 1}
-      >
-        <GrFormPrevious size={20} />
-      </button>
-      <ul className='pagination'>
+    <ul className="pagination">
+      {activePage > 1 && (
+        <li>
+          <a onClick={() => handlePageClick(activePage - 1)}>
+            <GrFormPrevious />
+          </a>
+        </li>
+      )}
 
-        {
-          pageNumbers.map(number => (
-            <li key={number} className={activePage === number ? 'active' : ''}>
-              <a onClick={() => handlePageClick(number)}>{number}</a>
-            </li>
-          ))
-        }
+      {pageNumbers.map(number => (
+        <li key={number} className={activePage === number ? 'active' : ''}>
+          <a onClick={() => handlePageClick(number)}>{number}</a>
+        </li>
+      ))}
 
-      </ul>
-      <button
-        style={{ border: 'none', backgroundColor: 'inherit' }}
-        onClick={() => handlePageClick(activePage + 1)}
-        hidden={activePage === pageNumbers.length}
-      >
-        <GrFormNext size={20} />
-      </button>
-    </div>
+      {activePage < pageNumbers.length && (
+        <li>
+          <a onClick={() => handlePageClick(activePage + 1)}>
+            <GrFormNext />
+          </a>
+        </li>
+      )}
+    </ul>
   );
 }

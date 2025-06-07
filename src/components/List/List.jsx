@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import Task from './Task/Task';
 import { IoSearch } from "react-icons/io5";
 import { MdAddCircleOutline } from "react-icons/md";
-import { slugify } from '../../utils/formatter';
 import Modal from 'react-modal';
 import Pagination from '../Pagination/Pagination';
+import { v4 as uuidv4 } from 'uuid';
 
 Modal.setAppElement('#root');
 
@@ -16,6 +16,9 @@ export default function List() {
   const [searchResult, setSearchResult] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  //
+  const [filteredResultLength, setFilteredResultLength] = useState(0);
+  const [taskDescription, setTaskDescription] = useState('');
 
   useEffect(() => {
     const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
@@ -28,6 +31,7 @@ export default function List() {
     const filterResult = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
     const pagingResult = filterResult.slice(indexOfFirstTask, indexOfLastTask);
     setSearchResult(pagingResult);
+    setFilteredResultLength(filterResult.length);
   }, [currentPage, taskName, tasks])
 
   const completeTask = (taskId) => {
@@ -42,8 +46,9 @@ export default function List() {
   const addTask = (event) => {
     event.preventDefault();
     const newTask = {
-      id: tasks.length,
+      id: uuidv4(),
       name: taskName ? taskName : 'New Task',
+      description: taskDescription,
       isCompleted: false,
     }
     const updatedTasks = [newTask, ...tasks];
@@ -72,16 +77,6 @@ export default function List() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
-  const findTask = (event) => {
-    event.preventDefault();
-    if (!taskName) {
-      setSearchResult(tasks);
-      return;
-    };
-    const result = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
-    setSearchResult(result);
-  }
-
   const openModal = () => {
     setModalIsOpen(true);
   }
@@ -96,9 +91,11 @@ export default function List() {
     <div style={{ width: "50%", margin: "0 auto", alignItems: "center", justifyContent: "center" }}>
       <h1>TODO LIST</h1>
 
-      <div style={{ display: 'flex', flex: '1', alignItems: 'center', backgroundColor: 'white', borderRadius: '10px', marginBottom: '20px', padding: '0px 10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'white', borderRadius: '10px', marginBottom: '20px', padding: '0px 10px' }}>
         <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <label htmlFor="task-name">Find:</label>
+          <label htmlFor="task-name">
+            <IoSearch size={30} />
+          </label>
           <input
             type="text"
             id="task-name"
@@ -106,10 +103,8 @@ export default function List() {
             placeholder="Task name"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
-          />
-          {/* <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <IoSearch size={30} />
-          </button> */}
+          ></input>
+
         </div>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
           <MdAddCircleOutline size={30} onClick={openModal} />
@@ -130,7 +125,7 @@ export default function List() {
 
       <Pagination
         itemsPerPage={tasksPerPage}
-        totalItems={searchResult.length}
+        totalItems={filteredResultLength}
         currentPage={currentPage}
         paginate={paginate}
       />
@@ -151,16 +146,30 @@ export default function List() {
         }}
         contentLabel="Add new task"
       >
-        <form onSubmit={addTask}>
-          <label htmlFor="task-name">Task name:</label>
-          <input
-            type="text"
-            id="task-name"
-            name="task-name"
-            placeholder="New task"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
-          />
+        <form className="add-task-modal" onSubmit={addTask}>
+          <div className="form-group">
+            <label htmlFor="task-name">Task name:</label>
+            <input
+              type="text"
+              id="task-name"
+              name="task-name"
+              placeholder="New task"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)} // ???
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="task-description">Task description:</label>
+            <textarea
+              id="task-description"
+              name="task-description"
+              placeholder="Describe your task"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)} // ???
+            />
+          </div>
+
           <input type="submit" value="Add" />
         </form>
       </Modal>
