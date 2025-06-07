@@ -2,6 +2,8 @@ import { useParams, useNavigate } from "react-router"
 import NotFound from "../../NotFound/NotFound.jsx";
 import { useState, useEffect } from "react";
 
+const MEMBERS = ['An', 'Bat', 'Sup', 'Messi', 'CR7']
+
 export default function TaskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -96,6 +98,19 @@ export default function TaskDetail() {
       }
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
+          <div style={{ minWidth: 90, fontWeight: 'bold', marginBottom: 4 }}>Assign to:</div>
+          <select
+            name='task-assignment'
+            onChange={(e) => updateTask('assignTo', e.target.value)}
+            value={currentTask.assignTo}
+            className='filter-dropdown-menu'
+          >
+            {MEMBERS.map(i => <option value={i}>{i}</option>)}
+          </select>
+        </div>
+
         <div style={{ minWidth: 90, fontWeight: 'bold', marginBottom: 4 }}>Description:</div>
         {isEditingDescription
           ? (

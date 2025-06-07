@@ -4,7 +4,7 @@ import { IoTrashBinSharp } from "react-icons/io5";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import { Link } from 'react-router';
 
-export default function Task({ task, completeTask, editTask, removeTask }) {
+export default function Task({ task, completeTask, editTask, removeTask, assignTask, members }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingName, setEditingName] = useState(task.name);
 
@@ -42,12 +42,35 @@ export default function Task({ task, completeTask, editTask, removeTask }) {
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             autoFocus
+            style={{ width: '150px' }}
           />
         ) : (
-          <div style={task.isCompleted ? { textDecoration: 'line-through' } : {}}>
+          <div style={task.isCompleted
+            ? {
+              textDecoration: 'line-through',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '150px'
+            }
+            : {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              width: '150px'
+            }}>
             {task.name}
           </div>
         )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 2 }}>
+        <div>Assign to: </div>
+        <select
+          onChange={(e) => assignTask(task.id, e.target.value)}
+          value={task.assignTo}
+          className='filter-dropdown-menu'
+        >
+          {members.map(i => <option value={i}>{i}</option>)}
+        </select>
       </div>
 
       <div className="task-right">
@@ -57,6 +80,6 @@ export default function Task({ task, completeTask, editTask, removeTask }) {
           <FaRegArrowAltCircleRight style={{ color: "black" }} />
         </Link>
       </div>
-    </div>
+    </div >
   )
 }

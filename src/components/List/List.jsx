@@ -14,15 +14,18 @@ const MEMBERS = ['An', 'Bat', 'Sup', 'Messi', 'CR7']
 
 export default function List() {
   const [tasks, setTasks] = useState([]);
-  const [taskName, setTaskName] = useState('');
+
   const [searchResult, setSearchResult] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  //
+
   const [filteredResultLength, setFilteredResultLength] = useState(0);
-  const [taskDescription, setTaskDescription] = useState('');
   const [statusFilter, setStatusFilter] = useState(null);
   const [memberFilter, setMemberFilter] = useState(null);
+
+  const [taskName, setTaskName] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [editingMember, setEditingMember] = useState(MEMBERS[0]);
 
   useEffect(() => {
     const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
@@ -63,7 +66,7 @@ export default function List() {
       name: taskName ? taskName : 'New Task',
       description: taskDescription,
       isCompleted: false,
-      assignTo: 'An',
+      assignTo: editingMember,
     }
     const updatedTasks = [newTask, ...tasks];
 
@@ -80,6 +83,15 @@ export default function List() {
     );
     updateList(updatedTasks);
   };
+
+  const assignTask = (taskId, member) => {
+    const updatedTasks = tasks.map(i =>
+      i.id === taskId
+        ? { ...i, assignTo: member }
+        : i
+    );
+    updateList(updatedTasks);
+  }
 
   const removeTask = (taskId) => {
     const updatedTasks = tasks.filter(i => i.id !== taskId);
@@ -162,6 +174,8 @@ export default function List() {
             completeTask={completeTask}
             editTask={editTask}
             removeTask={removeTask}
+            assignTask={assignTask}
+            members={MEMBERS}
           />
         ))}
       </div>
@@ -211,6 +225,18 @@ export default function List() {
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)} // ???
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="task-assignment">Assign to:</label>
+            <select
+              name='task-assignment'
+              onChange={(e) => setEditingMember(e.target.value)}
+              value={editingMember}
+              className='filter-dropdown-menu'
+            >
+              {MEMBERS.map(i => <option value={i}>{i}</option>)}
+            </select>
           </div>
 
           <input type="submit" value="Add" />
