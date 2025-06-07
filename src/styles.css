@@ -171,3 +171,11 @@ input[type="text"]:focus {
   background-color: white;
   color: black;
 }
+
+.filter-dropdown-menu {
+  padding: 5px 10px;
+  borderRadius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  width: 150px;
+}

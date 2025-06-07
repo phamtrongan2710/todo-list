@@ -10,6 +10,8 @@ Modal.setAppElement('#root');
 
 const tasksPerPage = 10;
 
+const MEMBERS = ['An', 'Bat', 'Sup', 'Messi', 'CR7']
+
 export default function List() {
   const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState('');
@@ -19,6 +21,8 @@ export default function List() {
   //
   const [filteredResultLength, setFilteredResultLength] = useState(0);
   const [taskDescription, setTaskDescription] = useState('');
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [memberFilter, setMemberFilter] = useState(null);
 
   useEffect(() => {
     const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
@@ -28,11 +32,20 @@ export default function List() {
   useEffect(() => {
     const indexOfLastTask = currentPage * tasksPerPage;
     const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-    const filterResult = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
+    const filterResult = tasks
+      .filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()))
+      .filter(i => {
+        if (statusFilter === null) return true;
+        return statusFilter === i.isCompleted;
+      })
+      .filter(i => {
+        if (memberFilter === null) return true;
+        return memberFilter === i.assignTo;
+      })
     const pagingResult = filterResult.slice(indexOfFirstTask, indexOfLastTask);
     setSearchResult(pagingResult);
     setFilteredResultLength(filterResult.length);
-  }, [currentPage, taskName, tasks])
+  }, [currentPage, taskName, tasks, statusFilter, memberFilter])
 
   const completeTask = (taskId) => {
     const updatedTasks = tasks.map(i =>
@@ -50,6 +63,7 @@ export default function List() {
       name: taskName ? taskName : 'New Task',
       description: taskDescription,
       isCompleted: false,
+      assignTo: 'An',
     }
     const updatedTasks = [newTask, ...tasks];
 
@@ -110,6 +124,35 @@ export default function List() {
           <MdAddCircleOutline size={30} onClick={openModal} />
         </button>
       </div >
+
+      <div style={{ display: 'flex', marginBottom: '20px', justifyContent: 'space-between' }}>
+        {/** Filter status */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          <div>Status: </div>
+          <select
+            onChange={(e) => setStatusFilter(e.target.value === 'null' ? null : e.target.value === 'true')}
+            value={statusFilter === null ? 'null' : statusFilter.toString()}
+            className='filter-dropdown-menu'
+          >
+            <option value="null">All</option>
+            <option value="false">Active</option>
+            <option value="true">Completed</option>
+          </select>
+        </div>
+
+        {/** Filter user */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          <div>Assign to: </div>
+          <select
+            onChange={(e) => setMemberFilter(e.target.value === 'null' ? null : e.target.value)}
+            value={memberFilter === null ? 'null' : memberFilter.toString()}
+            className='filter-dropdown-menu'
+          >
+            <option value='null'>All</option>
+            {MEMBERS.map(i => <option value={i}>{i}</option>)}
+          </select>
+        </div>
+      </div>
 
       <div className="flex-container list">
         {searchResult.map((task) => (
