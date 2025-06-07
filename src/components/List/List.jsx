@@ -137,7 +137,7 @@ export default function List() {
         </button>
       </div >
 
-      <div style={{ display: 'flex', marginBottom: '20px', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
         {/** Filter status */}
         <div style={{ display: 'flex', gap: 2 }}>
           <div>Status: </div>

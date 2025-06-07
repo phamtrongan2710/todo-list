@@ -42,7 +42,7 @@ export default function Task({ task, completeTask, editTask, removeTask, assignT
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             autoFocus
-            style={{ width: '150px' }}
+            style={{ width: '100%' }}
           />
         ) : (
           <div style={task.isCompleted
@@ -50,30 +50,31 @@ export default function Task({ task, completeTask, editTask, removeTask, assignT
               textDecoration: 'line-through',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              width: '150px'
+              width: '100%'
             }
             : {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              width: '150px'
+              width: '100%'
             }}>
             {task.name}
           </div>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: 2 }}>
-        <div>Assign to: </div>
-        <select
-          onChange={(e) => assignTask(task.id, e.target.value)}
-          value={task.assignTo}
-          className='filter-dropdown-menu'
-        >
-          {members.map(i => <option value={i}>{i}</option>)}
-        </select>
-      </div>
+
 
       <div className="task-right">
+        <div style={{ display: 'flex', gap: 2 }}>
+          <div>Assign to: </div>
+          <select
+            onChange={(e) => assignTask(task.id, e.target.value)}
+            value={task.assignTo}
+            className='filter-dropdown-menu'
+          >
+            {members.map(i => <option value={i}>{i}</option>)}
+          </select>
+        </div>
         <BiEditAlt onClick={handleEdit} />
         <IoTrashBinSharp onClick={() => removeTask(task.id)} />
         <Link to={`/${task.id}`} state={{ task }} >
