@@ -2,9 +2,9 @@ import { useParams } from "react-router";
 import NotFound from "../../NotFound/NotFound.jsx";
 
 export default function TaskDetail() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
-  const task = localTasks.find(task => task.slug === slug);
+  const task = localTasks.find(task => task.id == id);
 
   if (!task) {
     return <NotFound />;

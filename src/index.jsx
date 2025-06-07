@@ -13,7 +13,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path='/:slug' element={<TaskDetail />} />
+        <Route path='/:id' element={<TaskDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

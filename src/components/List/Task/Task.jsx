@@ -53,7 +53,7 @@ export default function Task({ task, completeTask, editTask, removeTask }) {
       <div className="task-right">
         <BiEditAlt onClick={handleEdit} />
         <IoTrashBinSharp onClick={() => removeTask(task.id)} />
-        <Link to={`/${task.slug}`} >
+        <Link to={`/${task.id}`} >
           <FaRegArrowAltCircleRight />
         </Link>
 

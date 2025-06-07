@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Task from './Task/Task';
 import { IoSearch } from "react-icons/io5";
 import { MdAddCircleOutline } from "react-icons/md";
@@ -8,19 +8,27 @@ import Pagination from '../Pagination/Pagination';
 
 Modal.setAppElement('#root');
 
+const tasksPerPage = 10;
+
 export default function List() {
-  const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
-  const [tasks, setTasks] = useState(localTasks);
+  const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState('');
-  const [searchResult, setSearchResult] = useState(localTasks);
+  const [searchResult, setSearchResult] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const tasksPerPage = 3;
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = searchResult.slice(indexOfFirstTask, indexOfLastTask);
+  useEffect(() => {
+    const localTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
+    setTasks(localTasks);
+  }, []);
 
+  useEffect(() => {
+    const indexOfLastTask = currentPage * tasksPerPage;
+    const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+    const filterResult = tasks.filter(i => i.name.toLowerCase().includes(taskName.toLowerCase()));
+    const pagingResult = filterResult.slice(indexOfFirstTask, indexOfLastTask);
+    setSearchResult(pagingResult);
+  }, [currentPage, taskName, tasks])
 
   const completeTask = (taskId) => {
     const updatedTasks = tasks.map(i =>
@@ -36,7 +44,6 @@ export default function List() {
     const newTask = {
       id: tasks.length,
       name: taskName ? taskName : 'New Task',
-      slug: taskName ? (slugify(taskName + ' ' + Date.now())) : 'new-task-' + Date.now(),
       isCompleted: false,
     }
     const updatedTasks = [newTask, ...tasks];
@@ -49,7 +56,7 @@ export default function List() {
   const editTask = (taskId, newName) => {
     const updatedTasks = tasks.map(i =>
       i.id === taskId
-        ? { ...i, name: newName, slug: slugify(newName + ' ' + Date.now()) }
+        ? { ...i, name: newName }
         : i
     );
     updateList(updatedTasks);
@@ -62,7 +69,6 @@ export default function List() {
 
   const updateList = (tasks) => {
     setTasks(tasks);
-    setSearchResult(tasks);
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
@@ -91,7 +97,7 @@ export default function List() {
       <h1>TODO LIST</h1>
 
       <div style={{ display: 'flex', flex: '1', alignItems: 'center', backgroundColor: 'white', borderRadius: '10px', marginBottom: '20px', padding: '0px 10px' }}>
-        <form onSubmit={findTask} style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <label htmlFor="task-name">Find:</label>
           <input
             type="text"
@@ -101,17 +107,17 @@ export default function List() {
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
           />
-          <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          {/* <button type="submit" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             <IoSearch size={30} />
-          </button>
-        </form>
+          </button> */}
+        </div>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
           <MdAddCircleOutline size={30} onClick={openModal} />
         </button>
       </div >
 
       <div className="flex-container list">
-        {currentTasks.map((task) => (
+        {searchResult.map((task) => (
           <Task
             key={task.id}
             task={task}
